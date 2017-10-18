@@ -1,0 +1,22 @@
+#!/bin/sh
+
+chown -R postgres ${PGDATA}
+chmod 0700 ${PGDATA}
+
+if [ ! -d "${PGDATA}/base" ]; then
+  echo "Initializing database..."
+  su-exec postgres /usr/bin/initdb -D ${PGDATA}
+  su-exec postgres /usr/bin/pg_ctl -D ${PGDATA} start
+  sleep 1s
+  psql -U postgres -d template1 -c "UPDATE pg_database SET datistemplate='false' WHERE datname IN ('template0', 'postgres');"
+  psql -U postgres -d template1 -c "DROP DATABASE template0;"
+  psql -U postgres -d template1 -c "DROP DATABASE postgres;"
+  psql -U postgres -d template1 -c "CREATE EXTENSION postgis;"
+  psql -U postgres -d template1 -c "ALTER ROLE postgres WITH PASSWORD '${PGPASS}'"
+  echo "local   all   all                md5" >  ${PGDATA}/pg_hba.conf
+  echo "host    all   all   0.0.0.0/0    md5" >> ${PGDATA}/pg_hba.conf
+  echo "listen_addresses='*'" >> ${PGDATA}/postgresql.conf
+  su-exec postgres /usr/bin/pg_ctl -D ${PGDATA} stop
+fi
+
+su-exec postgres postgres
