@@ -1,7 +1,8 @@
 #!/bin/sh
 
-chown -R postgres ${PGDATA}
-chmod 0700 ${PGDATA}
+mkdir -p "$PGDATA"
+chmod 700 "$PGDATA"
+chown -R postgres "$PGDATA"
 
 if [ ! -d "${PGDATA}/base" ]; then
   echo "Initializing database..."
@@ -16,6 +17,9 @@ if [ ! -d "${PGDATA}/base" ]; then
   echo "local   all   all                md5" >  ${PGDATA}/pg_hba.conf
   echo "host    all   all   0.0.0.0/0    md5" >> ${PGDATA}/pg_hba.conf
   echo "listen_addresses='*'" >> ${PGDATA}/postgresql.conf
+  echo "*:*:*:postgres:${PGPASS}" > /root/.pgpass
+  chmod 600 /root/.pgpass
+  createdb postgres -U postgres
   su-exec postgres /usr/bin/pg_ctl -D ${PGDATA} stop
 fi
 

@@ -7,8 +7,8 @@ export POSTGIS="2.3.2"
 export PROJ="4.9.3"
 export GDAL="2.1.3"
 
-export PACKAGES="curl make g++ linux-headers git automake autoconf libxml2-dev json-c-dev libtool"
-export REQUIRED="su-exec libstdc++ libxml2 json-c"
+export PACKAGES="curl make  git automake autoconf libxml2-dev json-c-dev libtool"
+export REQUIRED="su-exec libstdc++ libxml2-dev json-c g++ linux-headers"
 
 cd /tmp
 
@@ -25,6 +25,8 @@ cd postgresql-${VERSION}
 make && make install-strip
 cd contrib
 make && make install-strip
+cd src/interfaces/libpq
+make && make install
 
 cd /tmp
 
@@ -63,7 +65,7 @@ make && make install
 
 cd /tmp
 
-apk del ${GEOS_DEV} ${PACKAGES}
+apk del ${PACKAGES}
 
 cd /usr/bin
 rm -rf /usr/share/doc /usr/share/man /usr/share/gdal /tmp/* /etc/ssl /usr/include /var/cache/apk/*

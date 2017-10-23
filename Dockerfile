@@ -3,7 +3,7 @@ FROM python:3.5-alpine
 
 # Postgis
 ENV LANG en_US.utf8
-ENV PGDATA /data
+ENV PGDATA /postgres_data
 ENV PGPASS postgres
 
 # Elasticsearch
@@ -15,7 +15,6 @@ VOLUME /usr/share/elasticsearch/data
 RUN ln -s -f /usr/bin/python3.5 /usr/bin/python
 
 # Postgis
-RUN mkdir /data
 COPY postgis/install.sh .
 RUN sh install.sh
 COPY postgis/start_postgis /sbin/
